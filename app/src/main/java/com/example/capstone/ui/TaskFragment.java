@@ -1,4 +1,4 @@
-package com.example.capstone;
+package com.example.capstone.ui;
 
 import android.app.DatePickerDialog;
 import android.graphics.Color;
@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.capstone.R;
 import com.example.capstone.db.TaskDao;
 import com.example.capstone.models.Task;
 import com.google.android.material.textfield.TextInputEditText;
@@ -33,8 +34,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class TaskAssignmentFragment extends Fragment {
-
+public class TaskFragment extends Fragment {
     private TaskDao taskDao;
     private List<Task> taskList = new ArrayList<>();
 
@@ -75,11 +75,6 @@ public class TaskAssignmentFragment extends Fragment {
             View taskView = createTaskView(task, container);
             container.addView(taskView);
         }
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadTasks(); // Memuat ulang data saat fragment aktif kembali
     }
 
     private View createTaskView(Task task, ViewGroup parent) {
