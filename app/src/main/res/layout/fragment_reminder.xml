@@ -1,0 +1,128 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F9F9">
+
+    <!-- Top bar -->
+
+    <!-- Calendar Row -->
+
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:id="@+id/dateHeader"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Monday, 13"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="238dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:contentDescription="profile"
+            android:src="@drawable/ic_user" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/calendarRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <!-- Days (Hardcoded for simplicity) -->
+        <TextView
+            style="@style/DateText"
+            android:text="M\n13" />
+
+        <TextView
+            style="@style/DateText"
+            android:text="S\n14" />
+
+        <TextView
+            style="@style/DateText"
+            android:text="T\n15" />
+
+        <TextView
+            style="@style/DateText"
+            android:text="W\n16" />
+
+        <TextView
+            style="@style/DateText"
+            android:text="T\n17" />
+
+        <TextView
+            style="@style/DateText"
+            android:text="F\n18" />
+
+        <TextView
+            style="@style/DateText"
+            android:text="S\n19" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/reminderList"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calendarRow">
+
+        <!-- Sample Reminder Items -->
+        <TextView
+            style="@style/ReminderCard"
+            android:text="Reminder 1" />
+
+        <TextView
+            style="@style/ReminderCard"
+            android:text="Reminder 2" />
+
+        <TextView
+            style="@style/ReminderCard"
+            android:text="Reminder 3" />
+
+        <TextView
+            style="@style/ReminderCard"
+            android:text="Reminder 4" />
+
+        <TextView
+            style="@style/ReminderCard"
+            android:text="Reminder 5" />
+    </LinearLayout>
+
+    <!-- Reminders List -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

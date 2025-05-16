@@ -4,9 +4,9 @@
         android:icon="@drawable/ic_home"
         android:title="Home"/>
     <item
-        android:id="@+id/nav_notifications"
+        android:id="@+id/nav_reminder"
         android:icon="@drawable/ic_bell"
-        android:title="Notifications"/>
+        android:title="Reminder"/>
     <item
         android:id="@+id/nav_stats"
         android:icon="@drawable/ic_chart"
