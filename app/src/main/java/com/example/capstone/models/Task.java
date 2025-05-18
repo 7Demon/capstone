@@ -1,26 +1,32 @@
-package com.example.capstone.models;
+package com.example.capstone.models; // Package tempat class ini berada
 
+// Kelas model Task untuk merepresentasikan entitas tugas dalam aplikasi
 public class Task {
-    private int id;
-    private String title;
-    private String description;
-    private String startDate;
-    private String dueDate;
-    private int duration;
-    private boolean isCompleted;
+    // Properti / Atribut
+    private int id; // ID unik untuk setiap task
+    private String title; // Judul task
+    private String description; // Deskripsi task
+    private String startDate; // Tanggal mulai task (format string "05/18/25")
+    private String dueDate; // batas waktu task
+    private int duration; // Durasi task dalam jumlah hari
+    private boolean isCompleted; // Status apakah task sudah selesai
 
-    // Constructors
+    // Konstruktor
+
+    // Konstruktor kosong (untuk membuat objek tanpa parameter: mengambil dari database)
     public Task() {}
 
+    // Konstruktor untuk membuat task baru (tanpa id dan deskripsi)
     public Task(String title, String startDate, String dueDate, int duration) {
         this.title = title;
         this.startDate = startDate;
         this.dueDate = dueDate;
         this.duration = duration;
-        this.isCompleted = false;
+        this.isCompleted = false; // Default task
     }
 
-    // Getters and setters
+    // Getter dan Setter
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

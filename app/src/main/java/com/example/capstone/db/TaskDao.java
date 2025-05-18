@@ -18,15 +18,17 @@ public class TaskDao {
         dbHelper = new TaskDbHelper(context);
     }
 
+    // Buka koneksi ke database
     public void open() {
         db = dbHelper.getWritableDatabase();
     }
 
+    // Tutup koneksi ke database
     public void close() {
         dbHelper.close();
     }
 
-    // Create
+    // Tambah data tugas (Create)
     public long insertTask(Task task) {
         ContentValues values = new ContentValues();
         values.put("title", task.getTitle());
@@ -39,7 +41,7 @@ public class TaskDao {
         return db.insert("tasks", null, values);
     }
 
-    // Read all tasks
+    // Ambil semua data tugas (Read)
     public List<Task> getAllTasks() {
         List<Task> tasks = new ArrayList<>();
         Cursor cursor = db.query("tasks", null, null, null, null, null, "due_date ASC");
@@ -62,7 +64,7 @@ public class TaskDao {
         return tasks;
     }
 
-    // Update
+    // Update data tugas
     public int updateTask(Task task) {
         ContentValues values = new ContentValues();
         values.put("title", task.getTitle());
@@ -75,8 +77,7 @@ public class TaskDao {
         return db.update("tasks", values, "id = ?", new String[]{String.valueOf(task.getId())});
     }
 
-
-    // Delete
+    // Hapus data tugas berdasarkan ID
     public void deleteTask(int taskId) {
         db.delete("tasks", "id = ?", new String[]{String.valueOf(taskId)});
     }
