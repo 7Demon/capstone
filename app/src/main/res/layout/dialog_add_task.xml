@@ -60,7 +60,8 @@
                 android:hint="Start Date"
                 android:textColor="@color/black"
                 android:inputType="none"
-                android:focusable="false"/>
+                android:focusable="false"
+                android:enabled="false"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
