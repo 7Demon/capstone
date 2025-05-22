@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add New Task"
+        android:text="Tambah Tugas Baru"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/black"
@@ -31,13 +31,13 @@
             android:id="@+id/etTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Task Name"
+            android:hint="Judul Tugas"
             android:textColor="@color/black"
             android:inputType="textCapWords"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Date Row -->
+    <!-- Date Time Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                 android:id="@+id/etStartDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Start Date"
+                android:hint="Waktu Mulai"
                 android:textColor="@color/black"
                 android:inputType="none"
                 android:focusable="false"
@@ -70,7 +70,7 @@
             android:layout_width="16dp"
             android:layout_height="1dp"/>
 
-        <!-- Due Date -->
+        <!-- Due Date & Time -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -83,36 +83,35 @@
                 android:id="@+id/etDueDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Due Date"
+                android:hint="Deadline"
                 android:textColor="@color/black"
                 android:inputType="none"
-                android:focusable="false"/>
+                android:focusable="false"
+                android:clickable="true"/>
 
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <!-- Duration -->
+    <!-- Duration Info -->
     <TextView
         android:id="@+id/tvDuration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Duration: 0 days"
+        android:text="Durasi: 0 hari 0 jam 0 menit"
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:layout_marginBottom="24dp"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:textStyle="italic"/>
 
-    <!-- Save Button -->
-
-    <!-- Cancel Button -->
-
+    <!-- Action Buttons -->
     <Button
         android:id="@+id/btnSave"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/purple_500"
-        android:text="SAVE"
+        android:text="SIMPAN"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="16sp" />
@@ -122,7 +121,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:backgroundTint="@color/purple_500"
-        android:text="CANCEL"
+        android:text="BATAL"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="16sp" />

@@ -53,7 +53,7 @@ public class ReminderFragment extends Fragment {
         loadReminderTasks();
     }
 
-//    private void loadReminderTasks() {
+    //    private void loadReminderTasks() {
 //        // Initialize TaskDao
 //        taskDao = new TaskDao(requireContext());
 //        taskDao.open();
@@ -92,61 +92,61 @@ public class ReminderFragment extends Fragment {
 //
 //        taskDao.close();
 //    }
-private void loadReminderTasks() {
-    // Initialize TaskDao
-    taskDao = new TaskDao(requireContext());
-    taskDao.open();
+    private void loadReminderTasks() {
+        // Initialize TaskDao
+        taskDao = new TaskDao(requireContext());
+        taskDao.open();
 
-    // Get upcoming tasks (next 7 days)
-    List<Task> upcomingTasks = taskDao.getUpcomingTasks(3);
+        // Get upcoming tasks (next 7 days)
+        List<Task> upcomingTasks = taskDao.getUpcomingTasks(3);
 
-    // Clear existing views
-    reminderListLayout.removeAllViews();
+        // Clear existing views
+        reminderListLayout.removeAllViews();
 
-    // Get current date
-    Calendar calendar = Calendar.getInstance();
-    Date currentDate = calendar.getTime();
+        // Get current date
+        Calendar calendar = Calendar.getInstance();
+        Date currentDate = calendar.getTime();
 
-    // Format for parsing dates
-    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy", Locale.getDefault());
+        // Format for parsing dates
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy", Locale.getDefault());
 
-    for (Task task : upcomingTasks) {
-        try {
-            Date dueDate = sdf.parse(task.getDueDate());
+        for (Task task : upcomingTasks) {
+            try {
+                Date dueDate = sdf.parse(task.getDueDate());
 
-            // Normalisasi waktu ke 00:00:00 untuk kedua tanggal
-            Calendar cal = Calendar.getInstance();
+                // Normalisasi waktu ke 00:00:00 untuk kedua tanggal
+                Calendar cal = Calendar.getInstance();
 
-            // Normalisasi currentDate (hari ini)
-            cal.setTime(new Date());
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            Date currentDa = cal.getTime();
+                // Normalisasi currentDate (hari ini)
+                cal.setTime(new Date());
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                Date currentDa = cal.getTime();
 
-            // Normalisasi dueDate
-            cal.setTime(dueDate);
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            dueDate = cal.getTime();
+                // Normalisasi dueDate
+                cal.setTime(dueDate);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                dueDate = cal.getTime();
 
-            // Hitung selisih hari
-            long diffInMillis = dueDate.getTime() - currentDa.getTime();
-            int daysUntilDue = (int) (diffInMillis / (1000 * 60 * 60 * 24));
-            daysUntilDue = Math.max(daysUntilDue, 0);
+                // Hitung selisih hari
+                long diffInMillis = dueDate.getTime() - currentDa.getTime();
+                int daysUntilDue = (int) (diffInMillis / (1000 * 60 * 60 * 24));
+                daysUntilDue = Math.max(daysUntilDue, 0);
 
-            addReminderCard(task, daysUntilDue);
+                addReminderCard(task, daysUntilDue);
 
-        } catch (ParseException e) {
-            e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
-    }
 
-    taskDao.close();
-}
+        taskDao.close();
+    }
 
     private void addReminderCard(Task task, int daysUntilDue) {
         // Inflate reminder card layout

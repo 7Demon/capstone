@@ -1,9 +1,11 @@
 package com.example.capstone;
 
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,6 +39,8 @@ public class TaskAssignmentFragment extends Fragment {
 
     private TaskDao taskDao;
     private List<Task> taskList = new ArrayList<>();
+    private Handler handler = new Handler();
+    private Runnable updateRunnable;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,12 +81,6 @@ public class TaskAssignmentFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadTasks();
-    }
-
     private View createTaskView(Task task, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View taskView = inflater.inflate(R.layout.item_task, parent, false);
@@ -101,11 +99,22 @@ public class TaskAssignmentFragment extends Fragment {
             });
         }
 
-        if (tvStartDate != null) tvStartDate.setText(task.getStartDate());
-        if (tvDueDate != null) tvDueDate.setText(task.getDueDate());
-        if (tvDuration != null) tvDuration.setText(String.format(Locale.getDefault(), "%d days", task.getDuration()));
+        if (tvStartDate != null) tvStartDate.setText(formatDateTime(task.getStartDate()));
+        if (tvDueDate != null) tvDueDate.setText(formatDateTime(task.getDueDate()));
+        if (tvDuration != null) tvDuration.setText(calculateRemainingTime(task.getDueDate()));
 
         return taskView;
+    }
+
+    private String formatDateTime(String dateTime) {
+        try {
+            SimpleDateFormat originalFormat = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
+            SimpleDateFormat displayFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
+            Date date = originalFormat.parse(dateTime);
+            return displayFormat.format(date);
+        } catch (ParseException e) {
+            return dateTime;
+        }
     }
 
     private void showAddTaskDialog() {
@@ -126,31 +135,28 @@ public class TaskAssignmentFragment extends Fragment {
         Button btnSave = dialog.findViewById(R.id.btnSave);
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
 
-        // Set tanggal mulai otomatis ke hari ini
-        String currentDate = getCurrentDate();
-        etStartDate.setText(currentDate);
+        String currentDateTime = getCurrentDateTime();
+        etStartDate.setText(currentDateTime);
         etStartDate.setEnabled(false);
-        etStartDate.setFocusable(false);
 
-        // Setup date picker hanya untuk due date
-        etDueDate.setOnClickListener(v -> showDueDatePicker(etDueDate, currentDate, tvDuration));
+        etDueDate.setOnClickListener(v -> showDateTimePicker(etDueDate, tvDuration, currentDateTime));
 
         btnSave.setOnClickListener(v -> {
             String title = etTitle.getText() != null ? etTitle.getText().toString().trim() : "";
-            String dueDate = etDueDate.getText() != null ? etDueDate.getText().toString().trim() : "";
+            String dueDateTime = etDueDate.getText() != null ? etDueDate.getText().toString().trim() : "";
 
-            if (title.isEmpty() || dueDate.isEmpty()) {
+            if (title.isEmpty() || dueDateTime.isEmpty()) {
                 Toast.makeText(requireContext(), "Harap isi semua bidang", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            int duration = calculateDuration(currentDate, dueDate);
-            if (duration <= 0) {
-                Toast.makeText(requireContext(), "Tanggal deadline tidak valid", Toast.LENGTH_SHORT).show();
+            if (!isValidDueDate(currentDateTime, dueDateTime)) {
+                Toast.makeText(requireContext(), "Waktu deadline harus setelah waktu mulai", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Task newTask = new Task(title, currentDate, dueDate, duration);
+            // PERBAHAN PENTING DI SINI
+            Task newTask = new Task(title, currentDateTime, dueDateTime);
             taskDao.insertTask(newTask);
             loadTasks();
             dialog.dismiss();
@@ -160,17 +166,27 @@ public class TaskAssignmentFragment extends Fragment {
         dialog.show();
     }
 
-    private void showDueDatePicker(TextInputEditText dueDateField, String startDate, TextView durationField) {
-        Calendar calendar = Calendar.getInstance();
-        DatePickerDialog datePicker = new DatePickerDialog(
+    private void showDateTimePicker(TextInputEditText dueDateField, TextView durationField, String startDateTime) {
+        final Calendar calendar = Calendar.getInstance();
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
                 requireContext(),
                 (view, year, month, dayOfMonth) -> {
-                    String selectedDate = String.format(Locale.getDefault(), "%02d/%02d/%02d",
-                            month + 1, dayOfMonth, year % 100);
-                    dueDateField.setText(selectedDate);
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(
+                            requireContext(),
+                            (timeView, hourOfDay, minute) -> {
+                                String selectedDateTime = String.format(Locale.getDefault(),
+                                        "%02d/%02d/%02d %02d:%02d",
+                                        month + 1, dayOfMonth, year % 100, hourOfDay, minute);
 
-                    int duration = calculateDuration(startDate, selectedDate);
-                    durationField.setText(String.format(Locale.getDefault(), "Durasi: %d hari", duration));
+                                dueDateField.setText(selectedDateTime);
+                                durationField.setText(calculateDurationText(startDateTime, selectedDateTime));
+                            },
+                            calendar.get(Calendar.HOUR_OF_DAY),
+                            calendar.get(Calendar.MINUTE),
+                            true
+                    );
+                    timePickerDialog.show();
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -178,37 +194,121 @@ public class TaskAssignmentFragment extends Fragment {
         );
 
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy", Locale.getDefault());
-            Date minDate = sdf.parse(startDate);
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
+            Date minDate = sdf.parse(startDateTime);
             if (minDate != null) {
-                datePicker.getDatePicker().setMinDate(minDate.getTime());
+                datePickerDialog.getDatePicker().setMinDate(minDate.getTime());
             }
         } catch (ParseException e) {
-            Log.e("DatePicker", "Error parsing date", e);
+            Log.e("DateTimePicker", "Error parsing start date", e);
         }
 
-        datePicker.show();
+        datePickerDialog.show();
     }
 
-    private String getCurrentDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy", Locale.getDefault());
-        return sdf.format(new Date());
-    }
-
-    private int calculateDuration(String startDateStr, String dueDateStr) {
+    private String calculateDurationText(String startDateTime, String dueDateTime) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy", Locale.getDefault());
-            Date startDate = sdf.parse(startDateStr);
-            Date dueDate = sdf.parse(dueDateStr);
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
+            Date startDate = sdf.parse(startDateTime);
+            Date dueDate = sdf.parse(dueDateTime);
 
             if (startDate != null && dueDate != null) {
                 long diff = dueDate.getTime() - startDate.getTime();
-                return (int) (diff / (1000 * 60 * 60 * 24)) + 1;
+                long minutes = (diff / (1000 * 60)) % 60;
+                long hours = (diff / (1000 * 60 * 60)) % 24;
+                long days = diff / (1000 * 60 * 60 * 24);
+
+                return String.format(Locale.getDefault(),
+                        "Durasi: %d hari %d jam %d menit",
+                        days, hours, minutes);
             }
         } catch (ParseException e) {
-            Log.e("TaskFragment", "Error parsing date", e);
+            Log.e("Duration", "Error parsing date", e);
         }
-        return 0;
+        return "Durasi: -";
+    }
+
+    private String calculateRemainingTime(String dueDateTime) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
+            Date dueDate = sdf.parse(dueDateTime);
+            Date now = new Date();
+
+            if (dueDate != null) {
+                long diffMillis = dueDate.getTime() - now.getTime();
+                if (diffMillis > 0) {
+                    long minutes = (diffMillis / (1000 * 60)) % 60;
+                    long hours = (diffMillis / (1000 * 60 * 60)) % 24;
+                    long days = diffMillis / (1000 * 60 * 60 * 24);
+
+                    return String.format(Locale.getDefault(),
+                            "Sisa: %d hari %d jam %d menit",
+                            days, hours, minutes);
+                } else {
+                    return "⏰ Waktu Habis";
+                }
+            }
+        } catch (ParseException e) {
+            Log.e("RemainingTime", "Error parsing date", e);
+        }
+        return "-";
+    }
+
+    private boolean isValidDueDate(String startDateTime, String dueDateTime) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
+            Date startDate = sdf.parse(startDateTime);
+            Date dueDate = sdf.parse(dueDateTime);
+            return dueDate != null && startDate != null && dueDate.after(startDate);
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
+    private String getCurrentDateTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadTasks();
+        startRealtimeUpdates();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopRealtimeUpdates();
+    }
+
+    private void startRealtimeUpdates() {
+        updateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                updateDurations();
+                handler.postDelayed(this, 60000);
+            }
+        };
+        handler.post(updateRunnable);
+    }
+
+    private void stopRealtimeUpdates() {
+        handler.removeCallbacks(updateRunnable);
+    }
+
+    private void updateDurations() {
+        View view = getView();
+        if (view == null) return;
+
+        LinearLayout container = view.findViewById(R.id.tasksContainer);
+        for (int i = 0; i < container.getChildCount(); i++) {
+            View taskView = container.getChildAt(i);
+            TextView tvDuration = taskView.findViewById(R.id.tvDuration);
+            Task task = taskList.get(i);
+            tvDuration.setText(calculateRemainingTime(task.getDueDate()));
+        }
     }
 
     @Override
