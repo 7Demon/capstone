@@ -60,7 +60,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar">
 
-        <!-- Days (Hardcoded for simplicity) -->
+
         <TextView
             style="@style/DateText"
             android:text="M\n13" />

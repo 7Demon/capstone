@@ -37,68 +37,83 @@ import java.util.Locale;
 
 public class TaskAssignmentFragment extends Fragment {
 
+    // Komponen untuk mengakses database tugas
     private TaskDao taskDao;
+    // Daftar tugas yang akan ditampilkan
     private List<Task> taskList = new ArrayList<>();
+    // Handler untuk update realtime durasi tugas
     private Handler handler = new Handler();
+    // Runnable untuk menjalankan update berkala
     private Runnable updateRunnable;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Inisialisasi database saat fragment dibuat
         taskDao = new TaskDao(requireContext());
-        taskDao.open();
+        taskDao.open();  // Membuka koneksi database
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        // Inflate layout fragment
         View view = inflater.inflate(R.layout.fragment_task_assignment, container, false);
-        initUI(view);
-        loadTasks();
+        initUI(view);  // Setup tombol dan UI
+        loadTasks();   // Memuat tugas dari database
         return view;
     }
 
+    // Inisialisasi elemen UI dan event listener
     private void initUI(View view) {
+        // Tombol untuk membuka dialog tambah tugas
         view.findViewById(R.id.btnAddTask).setOnClickListener(v -> showAddTaskDialog());
+        // Tombol kembali ke halaman sebelumnya
         view.findViewById(R.id.backButton).setOnClickListener(v ->
                 requireActivity().getOnBackPressedDispatcher().onBackPressed());
     }
 
+    // Memuat tugas dari database dan menampilkannya
     private void loadTasks() {
         View view = getView();
         if (view == null) return;
 
         taskList.clear();
-        taskList.addAll(taskDao.getAllTasks());
+        taskList.addAll(taskDao.getAllTasks());  // Ambil semua tugas dari database
 
         LinearLayout container = view.findViewById(R.id.tasksContainer);
-        container.removeAllViews();
+        container.removeAllViews();  // Hapus tampilan lama
 
+        // Buat tampilan untuk setiap tugas
         for (Task task : taskList) {
             View taskView = createTaskView(task, container);
             container.addView(taskView);
         }
     }
 
+    // Membuat view untuk menampilkan detail tugas
     private View createTaskView(Task task, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View taskView = inflater.inflate(R.layout.item_task, parent, false);
 
+        // Hubungkan komponen UI dengan data tugas
         CheckBox cbTask = taskView.findViewById(R.id.cbTask);
         TextView tvStartDate = taskView.findViewById(R.id.tvStartDate);
         TextView tvDueDate = taskView.findViewById(R.id.tvDueDate);
         TextView tvDuration = taskView.findViewById(R.id.tvDuration);
 
+        // Set data ke CheckBox dan tambahkan listener untuk update status
         if (cbTask != null) {
             cbTask.setText(task.getTitle());
             cbTask.setChecked(task.isCompleted());
             cbTask.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 task.setCompleted(isChecked);
-                taskDao.updateTask(task);
+                taskDao.updateTask(task);  // Update status di database
             });
         }
 
+        // Format tanggal dan tampilkan
         if (tvStartDate != null) tvStartDate.setText(formatDateTime(task.getStartDate()));
         if (tvDueDate != null) tvDueDate.setText(formatDateTime(task.getDueDate()));
         if (tvDuration != null) tvDuration.setText(calculateRemainingTime(task.getDueDate()));
@@ -106,6 +121,7 @@ public class TaskAssignmentFragment extends Fragment {
         return taskView;
     }
 
+    // Mengubah format tanggal untuk tampilan
     private String formatDateTime(String dateTime) {
         try {
             SimpleDateFormat originalFormat = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
@@ -113,14 +129,16 @@ public class TaskAssignmentFragment extends Fragment {
             Date date = originalFormat.parse(dateTime);
             return displayFormat.format(date);
         } catch (ParseException e) {
-            return dateTime;
+            return dateTime;  // Kembalikan format asli jika parsing gagal
         }
     }
 
+    // Menampilkan dialog untuk menambah tugas baru
     private void showAddTaskDialog() {
         android.app.Dialog dialog = new android.app.Dialog(requireContext());
         dialog.setContentView(R.layout.dialog_add_task);
 
+        // Setup tampilan dialog
         Window window = dialog.getWindow();
         if (window != null) {
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
@@ -128,6 +146,7 @@ public class TaskAssignmentFragment extends Fragment {
             window.setGravity(Gravity.CENTER);
         }
 
+        // Inisialisasi komponen UI dalam dialog
         TextInputEditText etTitle = dialog.findViewById(R.id.etTitle);
         TextInputEditText etStartDate = dialog.findViewById(R.id.etStartDate);
         TextInputEditText etDueDate = dialog.findViewById(R.id.etDueDate);
@@ -135,13 +154,17 @@ public class TaskAssignmentFragment extends Fragment {
         Button btnSave = dialog.findViewById(R.id.btnSave);
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
 
+        // Set waktu mulai ke waktu sekarang
         String currentDateTime = getCurrentDateTime();
         etStartDate.setText(currentDateTime);
-        etStartDate.setEnabled(false);
+        etStartDate.setEnabled(false);  // Nonaktifkan edit waktu mulai
 
+        // Tampilkan date-time picker saat field due date diklik
         etDueDate.setOnClickListener(v -> showDateTimePicker(etDueDate, tvDuration, currentDateTime));
 
+        // Event listener untuk tombol simpan
         btnSave.setOnClickListener(v -> {
+            // Validasi input
             String title = etTitle.getText() != null ? etTitle.getText().toString().trim() : "";
             String dueDateTime = etDueDate.getText() != null ? etDueDate.getText().toString().trim() : "";
 
@@ -155,10 +178,10 @@ public class TaskAssignmentFragment extends Fragment {
                 return;
             }
 
-            // PERBAHAN PENTING DI SINI
+            // Simpan tugas baru ke database
             Task newTask = new Task(title, currentDateTime, dueDateTime);
             taskDao.insertTask(newTask);
-            loadTasks();
+            loadTasks();  // Refresh daftar tugas
             dialog.dismiss();
         });
 
@@ -166,20 +189,25 @@ public class TaskAssignmentFragment extends Fragment {
         dialog.show();
     }
 
+    // Menampilkan date dan time picker untuk memilih deadline
     private void showDateTimePicker(TextInputEditText dueDateField, TextView durationField, String startDateTime) {
         final Calendar calendar = Calendar.getInstance();
 
+        // Date picker dialog
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 requireContext(),
                 (view, year, month, dayOfMonth) -> {
+                    // Time picker dialog setelah tanggal dipilih
                     TimePickerDialog timePickerDialog = new TimePickerDialog(
                             requireContext(),
                             (timeView, hourOfDay, minute) -> {
+                                // Format tanggal yang dipilih
                                 String selectedDateTime = String.format(Locale.getDefault(),
                                         "%02d/%02d/%02d %02d:%02d",
                                         month + 1, dayOfMonth, year % 100, hourOfDay, minute);
 
                                 dueDateField.setText(selectedDateTime);
+                                // Hitung dan tampilkan durasi
                                 durationField.setText(calculateDurationText(startDateTime, selectedDateTime));
                             },
                             calendar.get(Calendar.HOUR_OF_DAY),
@@ -193,6 +221,7 @@ public class TaskAssignmentFragment extends Fragment {
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
 
+        // Set batas minimal tanggal ke waktu mulai
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
             Date minDate = sdf.parse(startDateTime);
@@ -206,6 +235,7 @@ public class TaskAssignmentFragment extends Fragment {
         datePickerDialog.show();
     }
 
+    // Menghitung durasi antara waktu mulai dan deadline
     private String calculateDurationText(String startDateTime, String dueDateTime) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
@@ -228,6 +258,7 @@ public class TaskAssignmentFragment extends Fragment {
         return "Durasi: -";
     }
 
+    // Menghitung sisa waktu sampai deadline
     private String calculateRemainingTime(String dueDateTime) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
@@ -254,6 +285,7 @@ public class TaskAssignmentFragment extends Fragment {
         return "-";
     }
 
+    // Validasi bahwa deadline harus setelah waktu mulai
     private boolean isValidDueDate(String startDateTime, String dueDateTime) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
@@ -265,39 +297,45 @@ public class TaskAssignmentFragment extends Fragment {
         }
     }
 
+    // Mendapatkan waktu sekarang dalam format tertentu
     private String getCurrentDateTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
         return sdf.format(new Date());
     }
 
+    // Lifecycle method: Memulai update realtime saat fragment aktif
     @Override
     public void onResume() {
         super.onResume();
         loadTasks();
-        startRealtimeUpdates();
+        startRealtimeUpdates();  // Mulai update durasi setiap menit
     }
 
+    // Lifecycle method: Menghentikan update saat fragment tidak aktif
     @Override
     public void onPause() {
         super.onPause();
-        stopRealtimeUpdates();
+        stopRealtimeUpdates();  // Hentikan update
     }
 
+    // Memulai pembaruan durasi secara realtime
     private void startRealtimeUpdates() {
         updateRunnable = new Runnable() {
             @Override
             public void run() {
                 updateDurations();
-                handler.postDelayed(this, 60000);
+                handler.postDelayed(this, 60000);  // Update setiap 60 detik
             }
         };
         handler.post(updateRunnable);
     }
 
+    // Menghentikan pembaruan realtime
     private void stopRealtimeUpdates() {
         handler.removeCallbacks(updateRunnable);
     }
 
+    // Memperbarui tampilan durasi untuk semua tugas
     private void updateDurations() {
         View view = getView();
         if (view == null) return;
@@ -311,9 +349,10 @@ public class TaskAssignmentFragment extends Fragment {
         }
     }
 
+    // Lifecycle method: Membersihkan sumber daya saat fragment dihancurkan
     @Override
     public void onDestroy() {
         super.onDestroy();
-        taskDao.close();
+        taskDao.close();  // Tutup koneksi database
     }
 }

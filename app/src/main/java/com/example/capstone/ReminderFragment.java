@@ -22,26 +22,30 @@ import java.util.Locale;
 
 public class ReminderFragment extends Fragment {
 
+    // DAO untuk mengakses database tugas
     private TaskDao taskDao;
+    // Layout untuk menampilkan daftar reminder
     private LinearLayout reminderListLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate layout fragment
         View view = inflater.inflate(R.layout.fragment_reminder, container, false);
 
-        // Initialize UI components
+        // Inisialisasi komponen UI
         reminderListLayout = view.findViewById(R.id.reminderList);
 
-        // Update date header (No. 5)
-        updateDateHeader(view); // Panggil method dengan parameter view
+        // Memperbarui header tanggal (menampilkan hari dan tanggal)
+        updateDateHeader(view);
 
         return view;
     }
 
-    // Method untuk update tanggal header
+    // Method untuk memperbarui header tanggal
     private void updateDateHeader(View view) {
-        TextView dateHeader = view.findViewById(R.id.dateHeader); // Ambil TextView dari view
+        TextView dateHeader = view.findViewById(R.id.dateHeader);
+        // Format tanggal: "Hari, Tanggal Bulan" (contoh: "Senin, 5 Juni")
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d MMMM", new Locale("id", "ID"));
         String currentDate = sdf.format(new Date());
         dateHeader.setText(currentDate);
@@ -50,82 +54,47 @@ public class ReminderFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Memuat tugas-tugas reminder saat fragment aktif
         loadReminderTasks();
     }
 
-    //    private void loadReminderTasks() {
-//        // Initialize TaskDao
-//        taskDao = new TaskDao(requireContext());
-//        taskDao.open();
-//
-//        // Get all tasks from database
-//        List<Task> allTasks = taskDao.getAllTasks();
-//
-//        // Clear existing views
-//        reminderListLayout.removeAllViews();
-//
-//        // Get current date
-//        Calendar calendar = Calendar.getInstance();
-//        Date currentDate = calendar.getTime();
-//
-//        // Format for parsing dates
-//        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy", Locale.getDefault());
-//
-//        for (Task task : allTasks) {
-//            try {
-//                // Parse task due date
-//                Date dueDate = sdf.parse(task.getDueDate());
-//
-//                // Calculate days until due date
-//                long diffInMillis = dueDate.getTime() - currentDate.getTime();
-//                int daysUntilDue = (int) (diffInMillis / (1000 * 60 * 60 * 24));
-//
-//                // Only show tasks that are not completed and due in the next 7 days
-//                if (!task.isCompleted() && daysUntilDue >= 0 && daysUntilDue <= 7) {
-//                    addReminderCard(task, daysUntilDue);
-//                }
-//
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        taskDao.close();
-//    }
+    // Memuat tugas-tugas yang akan dijadikan reminder
     private void loadReminderTasks() {
-        // Initialize TaskDao
+        // Inisialisasi TaskDao dan buka koneksi database
         taskDao = new TaskDao(requireContext());
         taskDao.open();
 
-        // Get upcoming tasks (next 7 days)
+        // Ambil tugas yang deadline-nya dalam 3 hari ke depan
         List<Task> upcomingTasks = taskDao.getUpcomingTasks(3);
 
-        // Clear existing views
+        // Hapus semua view yang ada sebelumnya
         reminderListLayout.removeAllViews();
 
-        // Get current date
+        // Dapatkan tanggal sekarang untuk perhitungan
         Calendar calendar = Calendar.getInstance();
         Date currentDate = calendar.getTime();
 
-        // Format for parsing dates
+        // Format untuk parsing tanggal dari string
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy", Locale.getDefault());
 
+        // Proses setiap tugas yang akan datang
         for (Task task : upcomingTasks) {
             try {
+                // Parse tanggal deadline tugas
                 Date dueDate = sdf.parse(task.getDueDate());
 
-                // Normalisasi waktu ke 00:00:00 untuk kedua tanggal
+                // Normalisasi waktu ke 00:00:00 untuk perhitungan yang akurat
                 Calendar cal = Calendar.getInstance();
 
-                // Normalisasi currentDate (hari ini)
+                // Normalisasi tanggal sekarang (hilangkan jam, menit, detik)
                 cal.setTime(new Date());
                 cal.set(Calendar.HOUR_OF_DAY, 0);
                 cal.set(Calendar.MINUTE, 0);
                 cal.set(Calendar.SECOND, 0);
                 cal.set(Calendar.MILLISECOND, 0);
-                Date currentDa = cal.getTime();
+                Date normalizedCurrentDate = cal.getTime();
 
-                // Normalisasi dueDate
+                // Normalisasi tanggal deadline
                 cal.setTime(dueDate);
                 cal.set(Calendar.HOUR_OF_DAY, 0);
                 cal.set(Calendar.MINUTE, 0);
@@ -133,11 +102,13 @@ public class ReminderFragment extends Fragment {
                 cal.set(Calendar.MILLISECOND, 0);
                 dueDate = cal.getTime();
 
-                // Hitung selisih hari
-                long diffInMillis = dueDate.getTime() - currentDa.getTime();
+                // Hitung selisih hari antara sekarang dan deadline
+                long diffInMillis = dueDate.getTime() - normalizedCurrentDate.getTime();
                 int daysUntilDue = (int) (diffInMillis / (1000 * 60 * 60 * 24));
+                // Pastikan tidak negatif (jika deadline sudah lewat)
                 daysUntilDue = Math.max(daysUntilDue, 0);
 
+                // Tambahkan card reminder untuk tugas ini
                 addReminderCard(task, daysUntilDue);
 
             } catch (ParseException e) {
@@ -145,51 +116,62 @@ public class ReminderFragment extends Fragment {
             }
         }
 
+        // Tutup koneksi database
         taskDao.close();
     }
 
+    // Menambahkan card reminder ke dalam layout
     private void addReminderCard(Task task, int daysUntilDue) {
-        // Inflate reminder card layout
+        // Inflate layout card reminder
         View cardView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.item_reminder_card, reminderListLayout, false);
 
+        // Dapatkan referensi ke komponen dalam card
         TextView titleText = cardView.findViewById(R.id.reminderTitle);
         TextView dueDateText = cardView.findViewById(R.id.reminderDueDate);
         TextView daysLeftText = cardView.findViewById(R.id.reminderDaysLeft);
 
-        // Set task data to the card
+        // Set data tugas ke card
         titleText.setText(task.getTitle());
         dueDateText.setText("Due: " + task.getDueDate());
 
-        // Custom styling for tasks due in <= 2 days
+        // Styling untuk tugas yang mendekati deadline (<= 2 hari)
         if (daysUntilDue <= 2) {
-            // Change background color for urgent tasks
+            // Set background merah untuk tugas urgent
             cardView.setBackgroundResource(R.drawable.urgent_card_background);
 
-            // Change text colors for better contrast
+
             titleText.setTextColor(getResources().getColor(android.R.color.white));
             dueDateText.setTextColor(getResources().getColor(android.R.color.white));
 
-            // Set urgent text
-            if (daysUntilDue <= 0) { // Deadline hari ini atau sudah lewat
+            // Pesan khusus berdasarkan hari tersisa
+            if (daysUntilDue <= 0) {
                 daysLeftText.setText("HARI INI BATAS WAKTU!");
             } else if (daysUntilDue == 1) {
                 daysLeftText.setText("BATAS WAKTU BESOK!");
-            } else if (daysUntilDue == 2) { // Tambah kondisi khusus untuk 2 hari
+            } else if (daysUntilDue == 2) {
                 daysLeftText.setText("TINGGAL 2 HARI LAGI!");
             } else {
                 daysLeftText.setText(daysUntilDue + " hari lagi");
             }
             daysLeftText.setTextColor(getResources().getColor(android.R.color.white));
         } else {
-            // Normal styling for tasks with > 2 days left
+            // Styling tugas yang masih punya waktu (> 2 hari)
             if (daysUntilDue <= 7) {
                 daysLeftText.setText(daysUntilDue + " hari lagi");
                 daysLeftText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
             }
         }
+        // Set layout params untuk membuat card lebih kecil
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.WRAP_CONTENT
+//        );
+//        params.setMargins(8, 4, 8, 4);
+//        cardView.setLayoutParams(params);
 
-        // Add card to the reminder list
+
+        // Tambahkan card ke dalam layout reminder
         reminderListLayout.addView(cardView);
     }
 }
