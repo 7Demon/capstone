@@ -1,5 +1,12 @@
 package com.example.capstone;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -8,6 +15,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.capstone.db.TaskDao;
@@ -22,59 +32,57 @@ import java.util.Locale;
 
 public class ReminderFragment extends Fragment {
 
-    private TaskDao taskDao;
-    private LinearLayout reminderListLayout;
+    private TaskDao taskDao; // Akses database task
+    private LinearLayout reminderListLayout; // Layout untuk menampilkan list pengingat
 
-    // Handler dan Runnable untuk menjadwalkan update saat tengah malam
-    private Handler dateRefreshHandler = new Handler();
-    private Runnable midnightRunnable;
+    private Handler dateRefreshHandler = new Handler(); // Handler untuk refresh otomatis
+    private Runnable midnightRunnable; // Runnable untuk trigger di tengah malam
+
+    private static final String CHANNEL_ID = "task_reminder_channel"; // ID channel notifikasi
+    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 101; // Kode request permission
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate layout fragment
         View view = inflater.inflate(R.layout.fragment_reminder, container, false);
-
-        // Inisialisasi layout untuk menampung card reminder
         reminderListLayout = view.findViewById(R.id.reminderList);
 
-        // Tampilkan tanggal hari ini sebagai header
-        updateDateHeader(view);
+        createNotificationChannel(); // Buat channel notifikasi jika perlu (Android 8+)
 
-        // Tambahkan baris kalender 7 hari ke depan secara dinamis
-        populateDateRow(view);
-
-        // Jadwalkan pembaruan otomatis saat hari berganti (jam 00:00)
-        scheduleMidnightRefresh(view);
+        updateDateHeader(view);      // Perbarui header tanggal
+        populateDateRow(view);       // Isi baris kalender kecil
+        scheduleMidnightRefresh(view); // Jadwalkan refresh tengah malam
 
         return view;
     }
 
-    // Mengatur teks header tanggal dengan format "Sabtu, 25 Mei"
     private void updateDateHeader(View view) {
+        // Format tanggal: Senin, 27 Mei
         TextView dateHeader = view.findViewById(R.id.dateHeader);
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d MMMM", new Locale("id", "ID"));
         String currentDate = sdf.format(new Date());
         dateHeader.setText(currentDate);
     }
 
-    // Menampilkan baris kalender (7 hari ke depan) di atas daftar reminder
     private void populateDateRow(View view) {
+        // Tampilkan 7 hari ke depan dalam bentuk singkat (baris kalender)
         LinearLayout calendarRow = view.findViewById(R.id.calendarRow);
-        calendarRow.removeAllViews(); // Hapus elemen sebelumnya
+        calendarRow.removeAllViews();
 
-        SimpleDateFormat dayFormat = new SimpleDateFormat("E", new Locale("id", "ID")); // Sen, Sel, Rab
-        SimpleDateFormat dateFormat = new SimpleDateFormat("d", Locale.getDefault());   // 25, 26, dst
+        SimpleDateFormat dayFormat = new SimpleDateFormat("E", new Locale("id", "ID"));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("d", Locale.getDefault());
 
         Calendar calendar = Calendar.getInstance();
 
         for (int i = 0; i < 7; i++) {
             Date date = calendar.getTime();
-            String dayLabel = dayFormat.format(date);
-            String dateLabel = dateFormat.format(date);
+            String dayLabel = dayFormat.format(date); // Hari (Sen, Sel, ...)
+            String dateLabel = dateFormat.format(date); // Tanggal (1, 2, ...)
+
             String fullLabel = dayLabel + "\n" + dateLabel;
 
-            // Buat TextView untuk satu hari kalender
+            // Buat tampilan tanggal kecil
             TextView dateView = new TextView(getContext());
             dateView.setText(fullLabel);
             dateView.setTextSize(14);
@@ -83,70 +91,61 @@ public class ReminderFragment extends Fragment {
             dateView.setBackgroundResource(R.drawable.calendar_day_background);
             dateView.setTextColor(getResources().getColor(android.R.color.black));
 
-            // Tambahkan ke baris kalender
             calendarRow.addView(dateView);
-            calendar.add(Calendar.DAY_OF_MONTH, 1); // Tambah 1 hari
+            calendar.add(Calendar.DAY_OF_MONTH, 1); // Lanjut ke hari berikutnya
         }
     }
 
-    // Menjadwalkan pembaruan otomatis saat tengah malam agar tampilan tetap realtime
     private void scheduleMidnightRefresh(View view) {
+        // Hitung waktu menuju tengah malam hari berikutnya
         long now = System.currentTimeMillis();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(now);
-        calendar.add(Calendar.DAY_OF_YEAR, 1); // Tambah 1 hari
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.add(Calendar.DAY_OF_YEAR, 1); // Besok
+        calendar.set(Calendar.HOUR_OF_DAY, 0); // Jam 00:00:05
         calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 5); // Tambahkan sedikit delay agar aman
+        calendar.set(Calendar.SECOND, 5);
         calendar.set(Calendar.MILLISECOND, 0);
 
         long midnight = calendar.getTimeInMillis();
         long delay = midnight - now;
 
-        // Runnable akan dijalankan saat tengah malam
+        // Runnable yang dijalankan saat tengah malam
         midnightRunnable = () -> {
             if (getView() != null) {
                 updateDateHeader(getView());
                 populateDateRow(getView());
-                loadReminderTasks();
-                scheduleMidnightRefresh(getView()); // Jadwalkan ulang untuk hari berikutnya
+                loadReminderTasks(); // Muat ulang pengingat
+                scheduleMidnightRefresh(getView()); // Jadwalkan ulang
             }
         };
 
+        // Jalankan runnable setelah delay
         dateRefreshHandler.postDelayed(midnightRunnable, delay);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        // Pastikan UI diperbarui ketika fragment diaktifkan kembali
         if (getView() != null) {
             updateDateHeader(getView());
             populateDateRow(getView());
         }
-
-        loadReminderTasks(); // Muat ulang daftar tugas
+        loadReminderTasks(); // Muat ulang saat kembali ke fragment
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
-        // Hindari memory leak dengan menghapus Runnable saat fragment dihancurkan
-        dateRefreshHandler.removeCallbacks(midnightRunnable);
+        dateRefreshHandler.removeCallbacks(midnightRunnable); // Stop refresh saat view dihancurkan
     }
 
-    // Memuat data tugas yang akan datang dari database
     private void loadReminderTasks() {
         taskDao = new TaskDao(requireContext());
         taskDao.open();
 
-        // Ambil maksimal 3 tugas mendatang
-        List<Task> upcomingTasks = taskDao.getUpcomingTasks(3);
-
-        // Hapus card sebelumnya
-        reminderListLayout.removeAllViews();
+        List<Task> upcomingTasks = taskDao.getUpcomingTasks(3); // Ambil tugas 3 hari ke depan
+        reminderListLayout.removeAllViews(); // Bersihkan tampilan lama
 
         Calendar calendar = Calendar.getInstance();
         Date currentDate = calendar.getTime();
@@ -157,7 +156,7 @@ public class ReminderFragment extends Fragment {
             try {
                 Date dueDate = sdf.parse(task.getDueDate());
 
-                // Normalisasi tanggal agar hanya tanggalnya saja yang dibandingkan (tanpa jam)
+                // Normalisasi waktu ke 00:00:00
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(new Date());
                 cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -173,23 +172,28 @@ public class ReminderFragment extends Fragment {
                 cal.set(Calendar.MILLISECOND, 0);
                 dueDate = cal.getTime();
 
-                // Hitung selisih hari
+                // Hitung selisih hari dari sekarang ke due date
                 long diffInMillis = dueDate.getTime() - normalizedCurrentDate.getTime();
                 int daysUntilDue = (int) (diffInMillis / (1000 * 60 * 60 * 24));
-                daysUntilDue = Math.max(daysUntilDue, 0); // Jangan biarkan negatif
+                daysUntilDue = Math.max(daysUntilDue, 0); // Minimal 0
 
-                addReminderCard(task, daysUntilDue); // Tambahkan ke tampilan
+                addReminderCard(task, daysUntilDue);
+
+                // Kirim notifikasi kalau tinggal <= 2 hari
+                if (daysUntilDue <= 2) {
+                    sendNotification(task, daysUntilDue);
+                }
 
             } catch (ParseException e) {
-                e.printStackTrace(); // Tangani error parsing
+                e.printStackTrace();
             }
         }
 
         taskDao.close(); // Tutup koneksi DB
     }
 
-    // Menambahkan satu kartu pengingat ke dalam layout
     private void addReminderCard(Task task, int daysUntilDue) {
+        // Buat kartu pengingat
         View cardView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.item_reminder_card, reminderListLayout, false);
 
@@ -200,8 +204,8 @@ public class ReminderFragment extends Fragment {
         titleText.setText(task.getTitle());
         dueDateText.setText("Due: " + task.getDueDate());
 
-        // Tampilkan card berwarna merah untuk task yang hampir atau sudah jatuh tempo
         if (daysUntilDue <= 2) {
+            // Tampilan card jika urgent
             cardView.setBackgroundResource(R.drawable.urgent_card_background);
             titleText.setTextColor(getResources().getColor(android.R.color.white));
             dueDateText.setTextColor(getResources().getColor(android.R.color.white));
@@ -215,14 +219,72 @@ public class ReminderFragment extends Fragment {
             }
             daysLeftText.setTextColor(getResources().getColor(android.R.color.white));
         } else {
-            // Warna biasa untuk tugas yang masih cukup waktu
             if (daysUntilDue <= 7) {
                 daysLeftText.setText(daysUntilDue + " hari lagi");
                 daysLeftText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
             }
         }
 
-        // Tambahkan card ke dalam layout
-        reminderListLayout.addView(cardView);
+        reminderListLayout.addView(cardView); // Tambahkan ke layout
+    }
+
+    private void createNotificationChannel() {
+        // Untuk Android 8+ (Oreo), notifikasi butuh channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Task Reminder Channel";
+            String description = "Channel for task reminders";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = requireContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void sendNotification(Task task, int daysUntilDue) {
+        // Android 13+ harus cek izin terlebih dahulu
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
+                return;
+            }
+        }
+
+        // Intent untuk buka app saat klik notifikasi
+        Intent intent = new Intent(requireContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(requireContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        String title = "Pengingat Tugas: " + task.getTitle();
+        String content = daysUntilDue <= 0 ? "Batas waktu hari ini!" :
+                daysUntilDue == 1 ? "Batas waktu besok!" :
+                        "Tinggal 2 hari lagi!";
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification) // Ikon notifikasi
+                .setContentTitle(title)
+                .setContentText(content)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true); // Hilang saat diklik
+
+        NotificationManager notificationManager = (NotificationManager) requireContext().getSystemService(NotificationManager.class);
+
+        // Gunakan ID unik (pakai ID task atau waktu saat ini)
+        int notificationId = task.getId() > 0 ? task.getId() : (int) System.currentTimeMillis();
+        notificationManager.notify(notificationId, builder.build());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Cek jika izin notifikasi disetujui
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                loadReminderTasks(); // Muat ulang untuk mengirim notifikasi
+            }
+        }
     }
 }
