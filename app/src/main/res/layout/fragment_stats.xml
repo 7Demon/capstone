@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
@@ -42,7 +43,9 @@
                     android:textSize="14sp"
                     android:textColor="#FF6B6B"/>
 
+                <!-- ID added -->
                 <TextView
+                    android:id="@+id/not_yet_percent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="40.00%"
@@ -72,7 +75,9 @@
                     android:textSize="14sp"
                     android:textColor="#4CAF50"/>
 
+                <!-- ID added -->
                 <TextView
+                    android:id="@+id/finished_percent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="60.00%"
@@ -91,40 +96,18 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Task List -->
+        <!-- Task List Container -->
+        <!-- Static items removed, ID added -->
         <LinearLayout
+            android:id="@+id/recent_tasks_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/bg_stats_card"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Task 1"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
+            <!-- Tasks will be added dynamically here -->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Task 2"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Task 3"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Task 4"
-                android:textSize="16sp"/>
         </LinearLayout>
 
         <!-- Projects Section -->
@@ -137,65 +120,16 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Capstone Project -->
+        <!-- Projects Container -->
+        <!-- Static projects removed, ID added -->
         <LinearLayout
+            android:id="@+id/projects_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_stats_card"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Capstone Project"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
+            <!-- Projects will be added dynamically here -->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Completed tasks 1"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Completed tasks 2"
-                android:textSize="14sp"/>
-        </LinearLayout>
-
-        <!-- Sains Data -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_stats_card"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sains Data"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Completed tasks 1"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Completed tasks 2"
-                android:textSize="14sp"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

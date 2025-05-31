@@ -6,10 +6,16 @@
     android:background="#F5F5F5"
     android:padding="16dp">
 
+
+
     <LinearLayout
+        android:id="@+id/scheduleContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+
+
 
         <!-- Header -->
         <LinearLayout
@@ -18,11 +24,13 @@
             android:orientation="horizontal"
             android:layout_marginBottom="24dp">
 
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Schedule"
+                android:textColor="@color/navy"
                 android:textSize="20sp"
                 android:textStyle="bold"/>
 
@@ -49,14 +57,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#E0E0E0"
+            android:background="@color/ijo"
             android:padding="8dp">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
-                android:text="No."
+                android:text="No"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <TextView
@@ -64,6 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
                 android:text="Jam-Ke"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <TextView
@@ -71,6 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
                 android:text="Ruang"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <TextView
@@ -78,6 +89,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
                 android:text="MK"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <TextView
@@ -85,6 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
                 android:text="Kelas"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
 
             <TextView
@@ -92,6 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:text="Dosen Pengampu"
+                android:textColor="@color/white"
                 android:textStyle="bold"/>
         </LinearLayout>
 
@@ -190,7 +204,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Solosa"
+            android:text="Selasa"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -241,4 +255,5 @@
                 android:text="Yan's Fithratul Islamy, B.Sc., M.I.M"/>
         </LinearLayout>
     </LinearLayout>
+
 </ScrollView>
