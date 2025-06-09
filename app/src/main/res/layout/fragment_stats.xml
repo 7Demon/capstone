@@ -109,28 +109,5 @@
             <!-- Tasks will be added dynamically here -->
 
         </LinearLayout>
-
-        <!-- Projects Section -->
-
-        <!-- Projects Container -->
-        <!-- Static projects removed, ID added -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"
-            android:text="Projects"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:id="@+id/projects_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Projects will be added dynamically here -->
-
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -25,9 +25,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import android.util.Log;
 
 public class ScheduleFragment extends Fragment {
 
+    private static final String TAG = "ScheduleFragment";
     private LinearLayout scheduleContainer;
     private ScheduleDao scheduleDao;
     private int scheduleCount = 0;
@@ -47,16 +49,25 @@ public class ScheduleFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
-
-        scheduleContainer = view.findViewById(R.id.scheduleContainer);
-        Button btnAddSchedule = view.findViewById(R.id.btnAddSchedule);
-
-        btnAddSchedule.setOnClickListener(v -> showAddScheduleDialog());
+        initUI(view);
         loadSchedules();
-
         return view;
+    }
+
+    private void initUI(View view) {
+        try {
+            scheduleContainer = view.findViewById(R.id.scheduleContainer);
+            view.findViewById(R.id.btnAddSchedule).setOnClickListener(v -> showAddScheduleDialog());
+
+            // Tombol back menggunakan OnBackPressedDispatcher
+            view.findViewById(R.id.backButton).setOnClickListener(v ->
+                    requireActivity().getOnBackPressedDispatcher().onBackPressed());
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing UI: " + e.getMessage());
+        }
     }
 
     private void loadSchedules() {

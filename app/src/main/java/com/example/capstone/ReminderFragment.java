@@ -55,20 +55,9 @@ public class ReminderFragment extends Fragment {
         createNotificationChannel();
         updateDateHeader(view);
         populateDateRow(view);
-        initUI(view);
         scheduleMidnightRefresh(view);
 
         return view;
-    }
-
-    private void initUI(View view) {
-        view.findViewById(R.id.backButton).setOnClickListener(v -> {
-            Fragment homeFragment = new HomeFragment();
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainerView, homeFragment)
-                    .commit();
-        });
     }
 
     private void updateDateHeader(View view) {

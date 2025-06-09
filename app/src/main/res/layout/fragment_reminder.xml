@@ -22,13 +22,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/backButton"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="Back"
-            android:src="@drawable/ic_back" />
-
         <TextView
             android:id="@+id/dateHeader"
             android:layout_width="275dp"
@@ -37,14 +30,6 @@
             android:text="Monday, 13"
             android:textSize="16sp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="238dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_weight="1"
-            android:contentDescription="profile"
-            android:src="@drawable/ic_user" />
     </LinearLayout>
 
     <LinearLayout
