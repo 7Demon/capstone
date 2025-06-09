@@ -8,67 +8,25 @@
     android:background="#F4F7F9"
     tools:context=".HomeFragment">
 
-    <!-- Profile Card -->
-    <LinearLayout
-        android:id="@+id/profileCard"
-        android:layout_width="0dp"
-        android:layout_height="80dp"
-        android:orientation="horizontal"
-        android:background="@drawable/bg_card"
-        android:padding="16dp"
-        android:layout_margin="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_user"
-            android:contentDescription="User" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_marginStart="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="User"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="#000" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="detail information"
-                android:textSize="12sp"
-                android:textColor="#666" />
-        </LinearLayout>
-    </LinearLayout>
-
     <!-- Greeting -->
     <TextView
         android:id="@+id/greeting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello, User!"
+        android:text="Hello, let's create your goals!"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/profileCard"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- 4 Buttons in Grid -->
+    <!-- 2 Buttons in Grid (full width) -->
     <GridLayout
         android:id="@+id/gridButtons"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:columnCount="2"
+        android:columnCount="1"
         android:rowCount="2"
         android:layout_margin="16dp"
         android:layout_marginTop="8dp"
@@ -85,7 +43,8 @@
             android:drawableStart="@drawable/ic_task"
             android:backgroundTint="#DDDDDD"
             android:textColor="#000"
-            android:padding="8dp" />
+            android:padding="12dp"
+            android:layout_gravity="fill_horizontal" />
 
         <Button
             android:id="@+id/btnSetSchedule"
@@ -96,29 +55,8 @@
             android:drawableStart="@drawable/ic_schedule"
             android:backgroundTint="#DDDDDD"
             android:textColor="#000"
-            android:padding="8dp" />
-
-        <Button
-            android:id="@+id/btnTodaysTask"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:text="Today's Task"
-            android:drawableStart="@drawable/ic_today"
-            android:backgroundTint="#DDDDDD"
-            android:textColor="#000"
-            android:padding="8dp" />
-
-        <Button
-            android:id="@+id/btnEventReminder"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:text="Event Reminder"
-            android:drawableStart="@drawable/ic_reminder"
-            android:backgroundTint="#DDDDDD"
-            android:textColor="#000"
-            android:padding="8dp" />
+            android:padding="12dp"
+            android:layout_gravity="fill_horizontal" />
     </GridLayout>
 
     <!-- Quote -->
@@ -139,42 +77,34 @@
     <!-- Goals Card -->
     <LinearLayout
         android:id="@+id/goalsCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/bg_card"
-        android:padding="16dp"
+        android:layout_width="380dp"
+        android:layout_height="395dp"
         android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/quoteText"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        android:padding="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/quoteText">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Goals of the Week"
+            android:layout_marginBottom="8dp"
+            android:text="Today's Task"
+            android:textColor="#000"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#000" />
+            android:textStyle="bold" />
 
-        <CheckBox
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/todayTasksContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Task 1" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Task 2" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Task 3" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Task 4" />
+            android:orientation="vertical">
+            <!-- Today's tasks will be added here dynamically -->
+        </LinearLayout>
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

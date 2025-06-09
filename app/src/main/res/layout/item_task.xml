@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -17,41 +18,69 @@
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:ellipsize="end"
-        android:maxLines="1"/>
+        android:maxLines="1" />
 
     <TextView
         android:id="@+id/tvStartDate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="0.8"
         android:gravity="center"
         android:textSize="12sp"
         android:textColor="#666"
         android:padding="4dp"
-        android:background="@drawable/bg_date_box"/>
+        android:background="@drawable/bg_date_box" />
 
     <TextView
         android:id="@+id/tvDueDate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="0.8"
         android:gravity="center"
         android:textSize="12sp"
         android:textColor="#666"
         android:padding="4dp"
         android:background="@drawable/bg_date_box"
         android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"/>
+        android:layout_marginEnd="4dp" />
 
     <TextView
         android:id="@+id/tvDuration"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.2"
+        android:layout_weight="1"
         android:gravity="center"
         android:textSize="12sp"
         android:textColor="#E91E63"
         android:padding="4dp"
         android:background="@drawable/bg_duration_box"
-        android:fontFamily="sans-serif-condensed"/>
+        android:fontFamily="sans-serif-condensed" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/btnEdit"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_edit"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Edit Task"
+            android:layout_marginBottom="4dp"
+            app:tint="@color/purple_500" />
+
+        <ImageButton
+            android:id="@+id/btnDelete"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Delete Task"
+            app:tint="@color/red_500" />
+    </LinearLayout>
+
 </LinearLayout>

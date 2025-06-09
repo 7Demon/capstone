@@ -11,8 +11,8 @@
         android:id="@+id/nav_stats"
         android:icon="@drawable/ic_chart"
         android:title="Stats"/>
-    <item
-        android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_user"
-        android:title="Profile"/>
+<!--    <item-->
+<!--        android:id="@+id/nav_profile"-->
+<!--        android:icon="@drawable/ic_user"-->
+<!--        android:title="Profile"/>-->
 </menu>

@@ -8,4 +8,8 @@
     <color name="ijo">#1B7B21</color>
     <color name="gray">#9E9E9E</color>
     <color name="dark_gray">#616161</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="red_500">#F44336</color>
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
 </resources>

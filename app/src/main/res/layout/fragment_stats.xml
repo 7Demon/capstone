@@ -15,11 +15,11 @@
         <!-- Progress Section -->
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
+            android:layout_marginBottom="16dp"
             android:text="Weekly Assignment Progress"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,28 +30,28 @@
             <!-- Not Yet Progress -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="vertical"
                 android:background="@drawable/bg_stats_card"
+                android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Not Yet"
-                    android:textSize="14sp"
-                    android:textColor="#FF6B6B"/>
+                    android:textColor="#FF6B6B"
+                    android:textSize="14sp" />
 
                 <!-- ID added -->
                 <TextView
                     android:id="@+id/not_yet_percent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="40.00%"
                     android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <!-- Spacer -->
@@ -62,48 +62,48 @@
             <!-- Finished Progress -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="137dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
                 android:background="@drawable/bg_stats_card"
+                android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Finished"
-                    android:textSize="14sp"
-                    android:textColor="#4CAF50"/>
+                    android:textColor="#4CAF50"
+                    android:textSize="14sp" />
 
                 <!-- ID added -->
                 <TextView
                     android:id="@+id/finished_percent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="60.00%"
                     android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 
         <!-- Tasks Completed Recently -->
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="37dp"
+            android:layout_marginBottom="16dp"
             android:text="Tasks Completed Recently"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
+            android:textStyle="bold" />
 
         <!-- Task List Container -->
         <!-- Static items removed, ID added -->
         <LinearLayout
             android:id="@+id/recent_tasks_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_height="96dp"
             android:background="@drawable/bg_stats_card"
+            android:orientation="vertical"
             android:padding="16dp">
 
             <!-- Tasks will be added dynamically here -->
@@ -111,17 +111,18 @@
         </LinearLayout>
 
         <!-- Projects Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Projects"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"/>
 
         <!-- Projects Container -->
         <!-- Static projects removed, ID added -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="Projects"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <LinearLayout
             android:id="@+id/projects_container"
             android:layout_width="match_parent"
