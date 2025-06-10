@@ -1,7 +1,5 @@
 package com.example.capstone.db;
 
-
-
 public final class ScheduleContract {
     private ScheduleContract() {}
 

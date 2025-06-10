@@ -1,8 +1,5 @@
 package com.example.capstone.db;
 
-// ScheduleDao.java
-
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -70,5 +67,29 @@ public class ScheduleDao {
         cursor.close();
         return schedules;
     }
-}
 
+    public int updateSchedule(Schedule schedule) {
+        ContentValues values = new ContentValues();
+        values.put(ScheduleContract.ScheduleEntry.COLUMN_DAY, schedule.getDay());
+        values.put(ScheduleContract.ScheduleEntry.COLUMN_TIME, schedule.getTime());
+        values.put(ScheduleContract.ScheduleEntry.COLUMN_ROOM, schedule.getRoom());
+        values.put(ScheduleContract.ScheduleEntry.COLUMN_COURSE_CODE, schedule.getCourseCode());
+        values.put(ScheduleContract.ScheduleEntry.COLUMN_COURSE_NAME, schedule.getCourseName());
+        values.put(ScheduleContract.ScheduleEntry.COLUMN_LECTURER, schedule.getLecturer());
+
+        return db.update(
+                ScheduleContract.ScheduleEntry.TABLE_NAME,
+                values,
+                ScheduleContract.ScheduleEntry.COLUMN_ID + " = ?",
+                new String[]{String.valueOf(schedule.getId())}
+        );
+    }
+
+    public void deleteSchedule(int scheduleId) {
+        db.delete(
+                ScheduleContract.ScheduleEntry.TABLE_NAME,
+                ScheduleContract.ScheduleEntry.COLUMN_ID + " = ?",
+                new String[]{String.valueOf(scheduleId)}
+        );
+    }
+}

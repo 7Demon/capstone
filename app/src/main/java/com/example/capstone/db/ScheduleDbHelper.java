@@ -1,6 +1,3 @@
-
-
-// ScheduleDbHelper.java
 package com.example.capstone.db;
 
 import android.content.Context;

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
     android:padding="16dp">
-
-
 
     <LinearLayout
         android:id="@+id/scheduleContainer"
@@ -14,16 +11,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
-
-
         <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="24dp">
-            android:paddingVertical="8dp">
+            android:paddingVertical="8dp"
+            android:layout_marginBottom="16dp">
 
             <ImageView
                 android:id="@+id/backButton"
@@ -32,7 +26,7 @@
                 android:src="@drawable/ic_back"
                 android:contentDescription="Back"
                 android:layout_marginEnd="16dp"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center_vertical" />
 
             <TextView
                 android:layout_width="0dp"
@@ -42,9 +36,7 @@
                 android:textColor="@color/navy"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:paddingTop="2dp"/>
+                android:gravity="center_vertical" />
 
             <Button
                 android:id="@+id/btnAddSchedule"
@@ -52,220 +44,9 @@
                 android:layout_height="wrap_content"
                 android:text="Add Schedule"
                 android:backgroundTint="#4CAF50"
-                android:textColor="#FFFFFF"/>
+                android:textColor="#FFFFFF" />
         </LinearLayout>
 
-        <!-- Schedule Table -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Senin"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Table Header -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@color/ijo"
-            android:padding="8dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:text="No"
-                android:textColor="@color/white"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="Jam-Ke"
-                android:textColor="@color/white"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="Ruang"
-                android:textColor="@color/white"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="MK"
-                android:textColor="@color/white"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="Kelas"
-                android:textColor="@color/white"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Dosen Pengampu"
-                android:textColor="@color/white"
-                android:textStyle="bold"/>
-        </LinearLayout>
-
-        <!-- Schedule Item 1 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#FFFFFF"
-            android:padding="8dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:text="1."/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="4-6"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="JO408"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="TIF3221354"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="Capstone Project"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Endang Wahyu Pamungkas SKom, WKom."/>
-        </LinearLayout>
-
-        <!-- Schedule Item 2 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#FFFFFF"
-            android:padding="8dp"
-            android:layout_marginTop="1dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:text="2."/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="7-8"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="LUX03"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="TIF1221251"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="Kewarganegaraan"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Eko Supriyanto, Dr. S.H., M.H"/>
-        </LinearLayout>
-
-        <!-- Solosa Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Selasa"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Schedule Item 3 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#FFFFFF"
-            android:padding="8dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:text="3."/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="7-9"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="JO410"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="TIF3221381"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:text="Kepita Selekta"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Yan's Fithratul Islamy, B.Sc., M.I.M"/>
-        </LinearLayout>
+        <!-- Konten jadwal akan di-inflate dari kode Java -->
     </LinearLayout>
-
 </ScrollView>

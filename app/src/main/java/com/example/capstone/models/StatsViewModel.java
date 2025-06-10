@@ -55,38 +55,21 @@ public class StatsViewModel extends AndroidViewModel {
 
             // Get recent completed tasks (last 4 completed)
             List<Task> recentCompleted = new ArrayList<>();
-            int count = Math.min(completedTasks.size(), 4);
+            int count = Math.min(completedTasks.size(), 6);
             for (int i = 0; i < count; i++) {
                 recentCompleted.add(completedTasks.get(completedTasks.size() - 1 - i));
             }
 
             // Group tasks by project
-            Map<String, List<String>> projectTasks = new HashMap<>();
 
-            // Capstone Project
-            List<String> capstoneTasks = new ArrayList<>();
-            for (Task task : completedTasks) {
-                if (task.getTitle().toLowerCase().contains("capstone")) {
-                    capstoneTasks.add(task.getTitle());
-                }
-            }
-            projectTasks.put("Capstone Project", capstoneTasks);
 
-            // Sains Data Project
-            List<String> sainsDataTasks = new ArrayList<>();
-            for (Task task : completedTasks) {
-                if (task.getTitle().toLowerCase().contains("data") ||
-                        task.getTitle().toLowerCase().contains("sains")) {
-                    sainsDataTasks.add(task.getTitle());
-                }
-            }
-            projectTasks.put("Sains Data", sainsDataTasks);
+
 
             // Post values to LiveData
             notYetProgress.postValue(notCompletedPercentage);
             finishedProgress.postValue(completedPercentage);
             recentTasks.postValue(recentCompleted);
-            projects.postValue(projectTasks);
+
 
             taskDao.close();
         }).start();

@@ -1,6 +1,3 @@
-
-
-// Schedule.java
 package com.example.capstone.models;
 
 public class Schedule {
@@ -12,7 +9,6 @@ public class Schedule {
     private String courseName;
     private String lecturer;
 
-    // Constructor
     public Schedule() {}
 
     public Schedule(String day, String time, String room, String courseCode, String courseName, String lecturer) {
@@ -24,7 +20,7 @@ public class Schedule {
         this.lecturer = lecturer;
     }
 
-    // Getters & Setters
+    // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getDay() { return day; }
