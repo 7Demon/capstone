@@ -24,48 +24,71 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Kelas Worker untuk menjalankan tugas di latar belakang (background task).
+ */
 public class TaskReminderWorker extends Worker {
 
+    // ID unik yang diperlukan untuk channel notifikasi.
     private static final String CHANNEL_ID = "task_reminder_channel";
 
+    // Constructor bawaan untuk Worker.
     public TaskReminderWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
+    /**
+     * Metode utama yang akan dijalankan oleh WorkManager di background.
+     */
     @NonNull
     @Override
     public Result doWork() {
+        // Buat channel notifikasi (wajib untuk Android 8+).
         createNotificationChannel();
 
+        // Buka koneksi ke database.
         TaskDao taskDao = new TaskDao(getApplicationContext());
         taskDao.open();
 
+
+        // mengambil semua tugas yang belum selesai.
         List<Task> tasks = taskDao.getUpcomingTasks(3);
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
 
-        Calendar cal = Calendar.getInstance();
-        Date today = normalize(cal.getTime());
+        // Dapatkan tanggal hari ini tanpa informasi waktu (jam, menit, dll).
+        Date today = normalize(new Date());
 
+        // Periksa setiap tugas satu per satu.
         for (Task task : tasks) {
             try {
+                // Ubah string tanggal deadline dari tugas menjadi objek Date.
                 Date dueDate = normalize(sdf.parse(task.getDueDate()));
+
+                // Hitung selisih hari antara hari ini dan tanggal deadline.
                 long diff = dueDate.getTime() - today.getTime();
                 int daysUntilDue = (int) (diff / (1000 * 60 * 60 * 24));
 
-                if (daysUntilDue <= 2) {
+                // Jika deadline dalam 2 hari, hari ini, atau besok, kirim notifikasi.
+                if (daysUntilDue >= 0 && daysUntilDue <= 2) {
                     sendNotification(task, daysUntilDue);
                 }
 
             } catch (ParseException e) {
+                // Catat jika ada error saat parsing tanggal.
                 e.printStackTrace();
             }
         }
-        Log.d("Worker", "Notifikasi dikirim!");
+        Log.d("Worker", "Pemeriksaan pengingat tugas selesai!");
 
+        // Tutup koneksi database.
         taskDao.close();
+
         return Result.success();
     }
 
+    /**
+     * Fungsi bantuan untuk menghapus informasi waktu (jam, menit, dll.) dari sebuah tanggal.
+     */
     private Date normalize(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -76,12 +99,24 @@ public class TaskReminderWorker extends Worker {
         return cal.getTime();
     }
 
+    /**
+     * Fungsi untuk membuat dan mengirim notifikasi ke pengguna.
+     * @param task Objek tugas yang akan diingatkan.
+     * @param daysUntilDue Sisa hari menuju deadline.
+     */
     private void sendNotification(Task task, int daysUntilDue) {
         String title = "Pengingat Tugas: " + task.getTitle();
-        String content = daysUntilDue <= 0 ? "Batas waktu hari ini!" :
-                daysUntilDue == 1 ? "Batas waktu besok!" :
-                        "Tinggal 2 hari lagi!";
+        //isi notifikasi berdasarkan sisa hari.
+        String content;
+        if (daysUntilDue <= 0) {
+            content = "Batas waktu hari ini!";
+        } else if (daysUntilDue == 1) {
+            content = "Batas waktu besok!";
+        } else {
+            content = "Tinggal " + daysUntilDue + " hari lagi!";
+        }
 
+        // Buat notifikasi menggunakan builder.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(title)
@@ -89,26 +124,28 @@ public class TaskReminderWorker extends Worker {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true);
 
+        // Cek izin untuk mengirim notifikasi (wajib untuk Android 13+).
         if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
+        // Kirim notifikasi. ID notifikasi dibuat unik berdasarkan ID tugas.
         NotificationManagerCompat.from(getApplicationContext()).notify(task.getId(), builder.build());
     }
 
+    /**
+     * Membuat Channel Notifikasi. Ini diperlukan untuk Android Oreo (API 26) ke atas.
+     */
     private void createNotificationChannel() {
+        // Kode ini hanya berjalan jika versi Android adalah Oreo atau lebih baru.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Task Reminder Channel";
             String description = "Channel for task reminders";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
+
+            // Daftarkan channel ke sistem.
             NotificationManager notificationManager = getApplicationContext().getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }

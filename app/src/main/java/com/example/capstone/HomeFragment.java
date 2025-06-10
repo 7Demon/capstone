@@ -25,27 +25,31 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
+
+    // Format tanggal untuk menentukan hari saat ini
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yy", Locale.getDefault());
 
-    private TaskDao taskDao;
-    private Handler handler = new Handler();
+    private TaskDao taskDao; // DAO untuk mengakses data tugas
+    private Handler handler = new Handler(); // Handler untuk pengecekan perubahan hari
     private Runnable updateRunnable;
-    private LinearLayout todayTasksContainer;
-    private String currentDay;
+    private LinearLayout todayTasksContainer; // Container untuk menampilkan tugas-tugas hari ini
+    private String currentDay; // Menyimpan hari saat ini
 
     public HomeFragment() {
-        // Required empty public constructor
+        // Konstruktor kosong diperlukan oleh Fragment
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
+            // Inisialisasi DAO dan buka koneksi database
             taskDao = new TaskDao(requireContext());
             taskDao.open();
-            currentDay = DATE_FORMAT.format(new Date());
+            currentDay = DATE_FORMAT.format(new Date()); // Simpan hari saat ini
         } catch (Exception e) {
             Log.e(TAG, "Error initializing TaskDao: " + e.getMessage());
         }
@@ -54,13 +58,15 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate layout untuk fragment ini
         View view = inflater.inflate(R.layout.home_fragment, container, false);
 
-        // Initialize UI components
+        // Inisialisasi tombol dan layout dari XML
         Button btnTaskAssignment = view.findViewById(R.id.btnTaskAssignment);
         Button btnSetSchedule = view.findViewById(R.id.btnSetSchedule);
         todayTasksContainer = view.findViewById(R.id.todayTasksContainer);
 
+        // Navigasi ke TaskAssignmentFragment saat tombol ditekan
         btnTaskAssignment.setOnClickListener(v -> {
             Fragment taskFragment = new TaskAssignmentFragment();
             getParentFragmentManager().beginTransaction()
@@ -69,6 +75,7 @@ public class HomeFragment extends Fragment {
                     .commit();
         });
 
+        // Navigasi ke ScheduleFragment saat tombol ditekan
         btnSetSchedule.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragmentContainerView, new ScheduleFragment())
@@ -82,21 +89,22 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadTodayTasks();
-        startDailyUpdateChecker();
+        loadTodayTasks(); // Muat ulang tugas hari ini saat fragment aktif kembali
+        startDailyUpdateChecker(); // Mulai pengecekan perubahan hari
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        stopDailyUpdateChecker();
+        stopDailyUpdateChecker(); // Hentikan pengecekan saat fragment tidak aktif
     }
 
+    // Memuat dan menampilkan daftar tugas untuk hari ini
     private void loadTodayTasks() {
         try {
             todayTasksContainer.removeAllViews();
 
-            List<Task> todayTasks = taskDao.getTodayTasks();
+            List<Task> todayTasks = taskDao.getTodayTasks(); // Ambil data tugas hari ini dari DB
 
             if (todayTasks.isEmpty()) {
                 TextView emptyView = new TextView(getContext());
@@ -110,14 +118,16 @@ public class HomeFragment extends Fragment {
             LayoutInflater inflater = LayoutInflater.from(getContext());
 
             for (Task task : todayTasks) {
+                // Inflate layout untuk setiap item tugas
                 View taskView = inflater.inflate(R.layout.item_today_task, todayTasksContainer, false);
 
                 CheckBox cbTask = taskView.findViewById(R.id.cbTask);
                 TextView tvStatus = taskView.findViewById(R.id.tvStatus);
 
                 cbTask.setText(task.getTitle());
-                cbTask.setChecked(task.isCompleted());
+                cbTask.setChecked(task.isCompleted()); // Tampilkan apakah tugas sudah selesai
 
+                // Atur teks dan warna status berdasarkan status tugas
                 String status = task.isCompleted() ? "Sudah dikerjakan" : "Belum dikerjakan";
                 int color = task.isCompleted() ?
                         ContextCompat.getColor(requireContext(), R.color.green) :
@@ -126,10 +136,12 @@ public class HomeFragment extends Fragment {
                 tvStatus.setText(status);
                 tvStatus.setTextColor(color);
 
+                // Listener jika checkbox diubah
                 cbTask.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    task.setCompleted(isChecked);
+                    task.setCompleted(isChecked); // Perbarui status tugas
                     taskDao.updateTask(task);
 
+                    // Perbarui status tampilan
                     String newStatus = isChecked ? "Sudah dikerjakan" : "Belum dikerjakan";
                     int newColor = isChecked ?
                             ContextCompat.getColor(requireContext(), R.color.green) :
@@ -139,39 +151,43 @@ public class HomeFragment extends Fragment {
                     tvStatus.setTextColor(newColor);
                 });
 
-                todayTasksContainer.addView(taskView);
+                todayTasksContainer.addView(taskView); // Tambahkan ke tampilan
             }
         } catch (Exception e) {
             Log.e(TAG, "Error loading today's tasks: " + e.getMessage());
         }
     }
 
+    // Mulai pengecekan otomatis untuk perubahan hari
     private void startDailyUpdateChecker() {
         updateRunnable = new Runnable() {
             @Override
             public void run() {
-                checkForDayChange();
-                handler.postDelayed(this, 60000); // Check every minute
+                checkForDayChange(); // Cek apakah hari sudah berganti
+                handler.postDelayed(this, 60000); // Jalankan lagi setiap 1 menit
             }
         };
         handler.post(updateRunnable);
     }
 
+    // Hentikan pengecekan otomatis
     private void stopDailyUpdateChecker() {
         handler.removeCallbacks(updateRunnable);
     }
 
+    // Cek apakah hari sudah berganti
     private void checkForDayChange() {
         String newDay = DATE_FORMAT.format(new Date());
         if (!newDay.equals(currentDay)) {
             currentDay = newDay;
-            loadTodayTasks();
+            loadTodayTasks(); // Reload tugas baru untuk hari baru
         }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        // Tutup koneksi database
         if (taskDao != null) {
             taskDao.close();
         }

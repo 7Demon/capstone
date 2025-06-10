@@ -12,19 +12,26 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
-
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.concurrent.TimeUnit;
+
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1;
+
+
+    // 3 Untuk 8 kali sehari
+    // REPEAT_INTERVAL untuk mengatur jeda antar notifikasi.
+    private static final long REPEAT_INTERVAL = 3;
+    private static final TimeUnit TIME_UNIT = TimeUnit.HOURS; // TimeUnit.MINUTES
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,14 +45,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Tampilkan fragment awal
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragmentContainerView, new HomeFragment())
                     .commit();
         }
 
-        // Setup bottom navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
@@ -68,11 +73,10 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
-        // Minta izin notifikasi jika perlu
         requestNotificationPermission();
 
-        // Jadwalkan background worker harian
-        scheduleDailyReminderWorker();
+        // Panggil fungsi penjadwalan yang baru
+        scheduleRepeatingReminderWorker();
     }
 
     private void requestNotificationPermission() {
@@ -85,26 +89,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void scheduleDailyReminderWorker() {
-        Calendar now = Calendar.getInstance();
-        Calendar target = Calendar.getInstance();
-        target.set(Calendar.HOUR_OF_DAY, 7); // waktu harian untuk reminder
-        target.set(Calendar.MINUTE, 0);
-        target.set(Calendar.SECOND, 0);
-        target.set(Calendar.MILLISECOND, 0);
-
-        long delay = target.getTimeInMillis() - now.getTimeInMillis();
-        if (delay < 0) {
-            delay += TimeUnit.DAYS.toMillis(1); // jika sudah lewat jam 7 pagi, jadwalkan besok
-        }
-
-        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(TaskReminderWorker.class, 24, TimeUnit.HOURS)
-                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+    /**
+     * Fungsi untuk menjadwalkan pengingat berulang dengan interval yang fleksibel.
+     */
+    private void scheduleRepeatingReminderWorker() {
+        // Buat permintaan kerja WorkManager yang berjalan secara periodik
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(TaskReminderWorker.class, REPEAT_INTERVAL, TIME_UNIT)
                 .build();
 
+        // Enqueue pekerjaan unik dengan nama "RepeatingTaskReminder".
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "DailyTaskReminder",
-                ExistingPeriodicWorkPolicy.KEEP,
+                "RepeatingTaskReminder",
+                ExistingPeriodicWorkPolicy.REPLACE,
                 request
         );
     }
