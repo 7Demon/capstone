@@ -10,4 +10,4 @@ TO DO LIST is apps for manage ur schedule, progress, and task or project at ur l
 5. and u can use it
 
 --wanna colab?
-u can contribute in this project for improvement ui/ux or add new feature.
+u can contribute in this project for improvement ui/ux or add new features.
