@@ -1,4 +1,5 @@
-mobile apps- TO DO LIST
+mobile apps- TO DO LIST.
+
 TO DO LIST is apps for manage ur schedule, progress, and task or project at ur lectures. and in this apps u can use reminder for ur task or project which approaching the deadline.
 
 --installation guide
