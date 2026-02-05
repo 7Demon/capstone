@@ -9,5 +9,5 @@ TO DO LIST is apps for manage ur schedule, progress, and task or project at ur l
 4. run the project
 5. and u can use it
 
---wanna colab?
-u can contribute in this project for improvement ui/ux or add new features.
+
+u can contribute in this project for improvement.
